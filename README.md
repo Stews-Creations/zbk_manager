@@ -18,7 +18,7 @@ Application source, dependency lockfiles, tests, and build tooling belong here. 
 
 Free noncommercial use, modification, and sharing are allowed with credit to
 [MiniStew](https://www.youtube.com/@MiniStew). Monetized videos and streams are
-allowed under the [media permission](MEDIA_PERMISSION.md). Selling covered ZBK
+allowed under the [media permission](LICENSES/MEDIA_PERMISSION.md). Selling covered ZBK
 content or maps containing it, or charging for server access, is not covered
-by that permission. See [licensing and attribution](LICENSE.md) for the code
+by that permission. See [licensing and attribution](LICENSES/LICENSE.md) for the code
 and asset licenses, their scope, and redistribution requirements.
