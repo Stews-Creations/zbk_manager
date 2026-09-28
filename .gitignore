@@ -1,0 +1,59 @@
+# Local environment and editor settings
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+Thumbs.db
+
+# Local assistant instructions, configuration, and planning
+AGENTS.md
+AGENTS.override.md
+CLAUDE.md
+GEMINI.md
+SKILL.md
+.agents/
+.skills/
+.codex/
+.claude/
+.cursor/
+.cursorrules
+.windsurf/
+.windsurfrules
+.continue/
+.aider*
+.mcp.json
+copilot-instructions.md
+*.instructions.md
+*.prompt.md
+.github/instructions/
+.github/prompts/
+.github/agents/
+.github/skills/
+.devtool/
+.devtools/
+
+# Authoring sources outside the core workspace
+blockbench/
+*.bbmodel
+*.ajblueprint
+*.ajblueprint.*
+
+# Local runtime and deliverables
+/output/
+/releases/
+/server/
+/worlds/
+/run/
+logs/
+*.log
+*.tmp
+
+# Application dependencies and generated installers
+node_modules/
+/dist/
+/dist2/
+/dist3/
+/coverage/
