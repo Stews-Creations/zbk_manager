@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZBK Server</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="i-world" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18"/></symbol>
+    <symbol id="i-pack" viewBox="0 0 24 24"><path d="M12 3 4 7v10l8 4 8-4V7z"/><path d="m4 7 8 4 8-4M12 11v10"/></symbol>
+    <symbol id="i-server" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="7" rx="2"/><rect x="4" y="13" width="16" height="7" rx="2"/><path d="M8 7.5h.01M8 16.5h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 8v5M12 16.5h.01"/><path d="M10.3 4.2 2.9 17a2 2 0 0 0 1.7 3h14.8a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0z"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.8h.01"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5.5v13l11-6.5z"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c.5-3.5 3-5.5 6.5-5.5s6 2 6.5 5.5M16 5.2a3.5 3.5 0 0 1 0 6.6M18 14.8c2 .7 3.2 2.5 3.5 5.2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v5.5c0 4.3 2.9 8 7 9.5 4.1-1.5 7-5.2 7-9.5V6z"/><path d="m9 12 2.2 2.2L15 10.4"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"/></symbol>
+    <symbol id="i-shrink" viewBox="0 0 24 24"><path d="M4 9h5V4M20 9h-5V4M4 15h5v5M20 15h-5v5"/></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="m7.5 9.5 3 2.5-3 2.5M13 15h3.5"/></symbol>
+  </svg>
+
+  <header class="top">
+    <div class="brand">
+      <span class="brand-mark"><img src="../../assets/icon.png" alt="" width="40" height="40"></span>
+      <span class="brand-text">
+        <span class="brand-name">ZBK Server</span>
+        <span class="brand-sub">Host your Zombies Build Kit world</span>
+      </span>
+    </div>
+
+    <div class="top-status">
+      <div class="status-pill" id="status-pill" data-state="stopped">
+        <span class="status-dot"></span>
+        <span id="status-text">Stopped</span>
+        <span class="uptime" id="uptime"></span>
+      </div>
+
+      <div class="join" id="join">
+        <span class="join-label">Players join with</span>
+        <code id="join-address"></code>
+        <button class="icon-button" id="copy-address" type="button" title="Copy address" aria-label="Copy address">
+          <svg><use href="#i-copy"/></svg>
+        </button>
+        <span class="copied" id="copied" hidden>Copied</span>
+      </div>
+    </div>
+
+    <div class="top-action">
+      <button class="start-hint" id="start-hint" type="button" hidden></button>
+      <button class="button primary large" id="start" type="button">
+        <svg><use href="#i-play"/></svg>
+        <span id="start-label">Start server</span>
+      </button>
+      <button class="button danger large" id="stop" type="button" hidden>
+        <svg><use href="#i-stop"/></svg>
+        <span id="stop-label">Stop</span>
+      </button>
+    </div>
+  </header>
+
+  <p class="banner error" id="run-error" hidden></p>
+
+  <main class="layout">
+    <!-- Setup -->
+    <section class="setup" aria-label="Setup">
+
+      <article class="card" id="card-world" data-state="todo">
+        <header class="card-head">
+          <span class="card-icon"><svg><use href="#i-world"/></svg></span>
+          <h2>World</h2>
+          <span class="card-state" id="state-world"></span>
+        </header>
+
+        <div class="empty" id="world-empty">
+          <p class="empty-title">Choose the world to host</p>
+          <p class="empty-text">Pick the folder that contains <code>level.dat</code>, usually inside <code>.minecraft/saves</code>.</p>
+          <button class="button primary" id="choose-world" type="button">
+            <svg><use href="#i-folder"/></svg>
+            <span id="choose-world-label">Choose world folder</span>
+          </button>
+        </div>
+
+        <div class="summary" id="world-card" hidden>
+          <div class="summary-head">
+            <div class="summary-title">
+              <span class="summary-name" id="world-name"></span>
+              <span class="summary-path" id="world-path"></span>
+            </div>
+            <button class="button small" id="change-world" type="button">Change</button>
+          </div>
+
+          <ul class="chips" id="world-chips"></ul>
+          <ul class="notes" id="world-notes"></ul>
+
+          <details class="more">
+            <summary>Datapacks in this world</summary>
+            <ul class="pack-list" id="world-datapacks"></ul>
+          </details>
+        </div>
+
+        <p class="message error" id="world-error" hidden></p>
+
+        <p class="footnote">
+          <svg><use href="#i-info"/></svg>
+          <span>The world must already contain its datapacks and structures, whether the structures are inside a datapack or saved in the world. The server runs a copy, so your save is never changed.</span>
+        </p>
+      </article>
+
+      <article class="card" id="card-pack" data-state="todo">
+        <header class="card-head">
+          <span class="card-icon"><svg><use href="#i-pack"/></svg></span>
+          <h2>Resource pack</h2>
+          <span class="card-state" id="state-pack"></span>
+        </header>
+
+        <div class="segments" role="radiogroup" aria-label="Which pack should players get?">
+          <input type="radio" name="pack-source" value="world" id="source-world">
+          <label for="source-world">From the world</label>
+          <input type="radio" name="pack-source" value="file" id="source-file">
+          <label for="source-file">ZIP file</label>
+          <input type="radio" name="pack-source" value="none" id="source-none">
+          <label for="source-none">None</label>
+        </div>
+
+        <div class="choice" id="choice-world" hidden>
+          <p class="choice-title" id="option-world-detail"></p>
+          <p class="choice-text" id="bundled-notice">Minecraft loads a world's pack only in singleplayer. A server never sends it, so this app shares it with players as a download.</p>
+        </div>
+
+        <div class="choice" id="choice-file" hidden>
+          <p class="choice-title" id="option-file-detail">No file chosen.</p>
+          <button class="button" id="choose-pack" type="button">
+            <svg><use href="#i-folder"/></svg>
+            <span id="choose-pack-label">Choose ZIP file</span>
+          </button>
+          <p class="choice-text" id="bundled-hint" hidden></p>
+        </div>
+
+        <div class="choice" id="choice-none" hidden>
+          <p class="choice-text">Players see default Minecraft textures. ZBK weapons and sounds will look and sound wrong.</p>
+        </div>
+
+        <p class="message error" id="pack-error" hidden></p>
+
+        <p class="link-preview" id="pack-link" hidden></p>
+
+        <details class="more" id="delivery" hidden>
+          <summary>Download options</summary>
+          <div class="delivery">
+            <div class="segments" role="radiogroup" aria-label="How do players download it?">
+              <input type="radio" name="pack-delivery" value="host" id="delivery-host">
+              <label for="delivery-host">This computer</label>
+              <input type="radio" name="pack-delivery" value="url" id="delivery-url">
+              <label for="delivery-url">Online link</label>
+            </div>
+
+            <div class="choice" id="choice-host" hidden>
+              <p class="choice-text">Works straight away on your home network. Leave the address empty to use the one players join with. Add a port, such as <code>example.net:8123</code>, when a tunnel gives the download its own.</p>
+              <div class="fields">
+                <label class="field">
+                  <span>Address for the pack download</span>
+                  <input type="text" id="pack-host" spellcheck="false" autocomplete="off">
+                </label>
+                <label class="field narrow">
+                  <span>Port</span>
+                  <input type="number" id="pack-port" min="1024" max="65535">
+                </label>
+              </div>
+            </div>
+
+            <div class="choice" id="choice-url" hidden>
+              <p class="choice-text">Paste a direct download link to the same ZIP, such as a GitHub release file.</p>
+              <div class="fields">
+                <label class="field">
+                  <span>Download link</span>
+                  <input type="url" id="pack-url" placeholder="https://" spellcheck="false" autocomplete="off">
+                </label>
+              </div>
+            </div>
+
+            <label class="check">
+              <input type="checkbox" id="pack-required">
+              <span>Players must accept the pack to join</span>
+            </label>
+          </div>
+        </details>
+      </article>
+
+      <article class="card" id="card-server" data-state="todo">
+        <header class="card-head">
+          <span class="card-icon"><svg><use href="#i-server"/></svg></span>
+          <h2>Server</h2>
+          <span class="card-state" id="state-server"></span>
+        </header>
+
+        <ul class="notes" id="server-notes"></ul>
+
+        <div class="fields three">
+          <label class="field">
+            <span>Memory (GB)</span>
+            <input type="number" id="setting-memory" min="1" max="64">
+          </label>
+          <label class="field">
+            <span>Port</span>
+            <input type="number" id="setting-port" min="1024" max="65535">
+          </label>
+          <label class="field">
+            <span>Player limit</span>
+            <input type="number" id="setting-players" min="1" max="1000">
+          </label>
+        </div>
+
+        <label class="field">
+          <span>Address players join with (optional)</span>
+          <input type="text" id="setting-address" spellcheck="false" autocomplete="off">
+        </label>
+
+        <details class="more">
+          <summary>More settings</summary>
+          <div class="fields stack">
+            <label class="field">
+              <span>Message shown in the server list</span>
+              <input type="text" id="setting-motd" maxlength="59" autocomplete="off">
+            </label>
+            <label class="field">
+              <span>Minecraft version</span>
+              <input type="text" id="setting-version" spellcheck="false" autocomplete="off">
+            </label>
+            <div class="field">
+              <span>Server folder</span>
+              <div class="folder-row">
+                <code id="server-folder"></code>
+                <button class="button small" id="change-folder" type="button">Change</button>
+                <button class="button small" id="open-folder" type="button">Open</button>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <label class="check" id="replace-row" hidden>
+          <input type="checkbox" id="replace-world">
+          <span id="replace-label">Replace the server world with a fresh copy</span>
+        </label>
+
+        <label class="check agree" id="eula-row">
+          <input type="checkbox" id="eula">
+          <span>I agree to the <button class="link" id="eula-link" type="button">Minecraft End User License Agreement</button></span>
+        </label>
+      </article>
+    </section>
+
+    <!-- Live server -->
+    <section class="live" aria-label="Server">
+      <div class="console">
+        <header class="panel-head">
+          <svg><use href="#i-terminal"/></svg>
+          <h2>Console</h2>
+          <button class="button small head-action" id="toggle-console" type="button" aria-pressed="false">
+            <svg><use id="toggle-console-icon" href="#i-expand"/></svg>
+            <span id="toggle-console-label">Expand</span>
+          </button>
+        </header>
+        <pre id="console-output" aria-live="off" tabindex="0"></pre>
+        <form class="console-input" id="command-form">
+          <span class="prompt">/</span>
+          <input type="text" id="command" placeholder="Type a server command" spellcheck="false" autocomplete="off" disabled>
+          <button class="button small" id="send-command" type="submit" disabled>Send</button>
+        </form>
+      </div>
+
+      <div class="people-column">
+        <section class="panel">
+          <header class="panel-head">
+            <svg><use href="#i-users"/></svg>
+            <h2>Players online</h2>
+            <span class="count" id="player-count">0</span>
+          </header>
+          <ul class="people" id="players"></ul>
+        </section>
+
+        <section class="panel">
+          <header class="panel-head">
+            <svg><use href="#i-shield"/></svg>
+            <h2>Admins</h2>
+          </header>
+          <ul class="people" id="operators"></ul>
+          <form class="add-admin" id="admin-form">
+            <input type="text" id="admin-name" placeholder="Player name" maxlength="32" spellcheck="false" autocomplete="off" disabled>
+            <button class="button small" id="add-admin" type="submit" disabled>Make admin</button>
+          </form>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
