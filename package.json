@@ -10,7 +10,7 @@
     "start": "electron .",
     "test": "node --test \"test/*.test.js\"",
     "build": "electron-builder --win nsis portable",
-    "check:package": "node tools/check_package.js"
+    "check:package": "node .github/scripts/check_package.js"
   },
   "build": {
     "appId": "com.ministew.zbkserver",
