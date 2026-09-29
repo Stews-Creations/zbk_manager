@@ -119,7 +119,7 @@ npm run build
 npm run check:package
 ```
 
-The build writes `ZBK-Server-Setup-<version>.exe` and `ZBK-Server-<version>-portable.exe` to `dist/`. The check confirms that both exist, that the `LICENSES` folder sits beside the app unchanged, that the Electron and Chromium notices are present, and that the packaged app holds only application files. It also writes `dist/SHA256SUMS.txt`.
+The build writes `ZBK-Server-Setup-<version>.exe` and `ZBK-Server-<version>-portable.exe` to `dist/`. The check confirms that both exist, that the `LICENSES` folder sits beside the app unchanged, that the Electron and Chromium notices are present, and that the packaged app holds only application files. It prints the SHA-256 checksum of each executable.
 
 The executables are not code signed, so Windows shows an unknown publisher warning the first time they run.
 
@@ -130,7 +130,7 @@ Download installers from the [releases page](https://github.com/Stews-Creations/
 | Workflow | Runs | Result |
 | --- | --- | --- |
 | [Build ZBK Server](.github/workflows/build.yml) | On every push, or manually | Tests, builds, inspects the build, and uploads the installer and portable app as workflow artifacts. These are development builds. |
-| [Release ZBK Server](.github/workflows/release.yml) | Manually from `main` | Publishes a GitHub release with the installer, the portable app, and their checksums. |
+| [Release ZBK Server](.github/workflows/release.yml) | Manually from `main` | Publishes a GitHub release with the installer and the portable app. Their checksums are printed in the workflow log. |
 
 To publish a release, set `version` in `package.json` and `package-lock.json`, merge to `main`, then run **Release ZBK Server** with the matching tag, such as `v1.0.0`. The workflow stops if the tag and the app version differ. Running it with an existing tag rebuilds that revision.
 
