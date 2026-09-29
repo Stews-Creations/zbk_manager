@@ -90,7 +90,6 @@ jobs:
           gh release create "$RELEASE_TAG" \
             "dist/ZBK-Server-Setup-$VERSION.exe" \
             "dist/ZBK-Server-$VERSION-portable.exe" \
-            dist/SHA256SUMS.txt \
             --title "ZBK Server $RELEASE_TAG" \
             --generate-notes \
             --verify-tag

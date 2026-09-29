@@ -141,7 +141,6 @@ if (problems.length) {
   process.exit(1);
 }
 
-const sums = installers.map(name => `${sha256(path.join(dist, name))}  ${name}`);
-fs.writeFileSync(path.join(dist, 'SHA256SUMS.txt'), sums.join('\n') + '\n');
-for (const line of sums) console.log(line);
+// Checksums go to the build log so a download can be compared against them.
+for (const name of installers) console.log(`${sha256(path.join(dist, name))}  ${name}`);
 console.log(`ZBK Server ${version} passed the package checks.`);
