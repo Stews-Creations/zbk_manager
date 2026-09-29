@@ -108,7 +108,7 @@ npm test
 | [src/main/lib/address.js](src/main/lib/address.js) | Host names, IP addresses, and ports entered by the user |
 | [src/renderer](src/renderer) | Interface page, styles, and logic |
 | [test](test) | Automated checks |
-| [tools/check_package.js](tools/check_package.js) | Inspection of a finished build before it is published |
+| [.github/scripts/check_package.js](.github/scripts/check_package.js) | Inspection of a finished build before it is published |
 
 The interface runs sandboxed without Node.js access. Files and processes are handled in the main process, and modules under `src/main/lib` do not depend on Electron so they can be tested directly.
 

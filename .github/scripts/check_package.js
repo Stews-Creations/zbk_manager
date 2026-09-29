@@ -1,7 +1,7 @@
 /**
  * check_package.js - Inspect a finished build before it is published.
  *
- * Usage: node tools/check_package.js [dist folder] [expected version]
+ * Usage: node .github/scripts/check_package.js [dist folder] [expected version]
  *
  * Confirms that the installer and portable executable exist, that the license
  * documents ship beside the app unchanged, that third-party notices are
@@ -12,7 +12,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
-const root = path.join(__dirname, '..');
+const root = path.join(__dirname, '..', '..');
 const dist = path.resolve(process.argv[2] || path.join(root, 'dist'));
 const version = process.argv[3] || require(path.join(root, 'package.json')).version;
 

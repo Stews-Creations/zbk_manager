@@ -72,7 +72,7 @@ jobs:
 
       - name: Inspect the build
         shell: bash
-        run: node tools/check_package.js dist "$VERSION"
+        run: node .github/scripts/check_package.js dist "$VERSION"
 
       - name: Create tag for new release
         if: env.CREATE_TAG == '1'

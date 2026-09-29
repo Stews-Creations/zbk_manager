@@ -37,7 +37,7 @@ jobs:
         run: |
           set -euo pipefail
           version="$(node -p "require('./package.json').version")"
-          node tools/check_package.js dist "$version"
+          node .github/scripts/check_package.js dist "$version"
           echo "VERSION=$version" >> "$GITHUB_ENV"
 
       - name: Upload installer
