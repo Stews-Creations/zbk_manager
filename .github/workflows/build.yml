@@ -1,0 +1,55 @@
+name: Build ZBK Server
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        shell: bash
+        run: npm ci
+
+      - name: Run tests
+        shell: bash
+        run: npm test
+
+      - name: Build installer and portable app
+        shell: bash
+        run: npm run build -- --publish never
+
+      - name: Inspect the build
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          node tools/check_package.js dist "$version"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v7
+        with:
+          path: dist/ZBK-Server-Setup-${{ env.VERSION }}.exe
+          archive: false
+          if-no-files-found: error
+
+      - name: Upload portable app
+        uses: actions/upload-artifact@v7
+        with:
+          path: dist/ZBK-Server-${{ env.VERSION }}-portable.exe
+          archive: false
+          if-no-files-found: error

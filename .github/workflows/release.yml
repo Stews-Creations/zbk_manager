@@ -1,0 +1,96 @@
+name: Release ZBK Server
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release tag (vMAJOR.MINOR.PATCH; existing or new)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      RELEASE_TAG: ${{ inputs.version }}
+    steps:
+      - name: Check out release branch
+        uses: actions/checkout@v5
+
+      - name: Select release revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_REF" == 'refs/heads/main' ]] || {
+            echo 'Run releases from main.' >&2
+            exit 1
+          }
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+            echo 'Release tags must use vMAJOR.MINOR.PATCH.' >&2
+            exit 1
+          }
+          if git ls-remote --exit-code --tags origin "refs/tags/$RELEASE_TAG" > /dev/null; then
+            git fetch --no-tags origin "refs/tags/$RELEASE_TAG:refs/tags/$RELEASE_TAG"
+            git checkout --detach "$RELEASE_TAG"
+          else
+            echo 'CREATE_TAG=1' >> "$GITHUB_ENV"
+          fi
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Verify app version
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#v}"
+          for manifest in package.json package-lock.json; do
+            test "$(node -p "require('./$manifest').version")" = "$version" || {
+              echo "$manifest version does not match $RELEASE_TAG" >&2
+              exit 1
+            }
+          done
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Install dependencies
+        shell: bash
+        run: npm ci
+
+      - name: Run tests
+        shell: bash
+        run: npm test
+
+      - name: Build installer and portable app
+        shell: bash
+        run: npm run build -- --publish never
+
+      - name: Inspect the build
+        shell: bash
+        run: node tools/check_package.js dist "$VERSION"
+
+      - name: Create tag for new release
+        if: env.CREATE_TAG == '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git tag "$RELEASE_TAG"
+          git push origin "refs/tags/$RELEASE_TAG"
+
+      - name: Publish GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$RELEASE_TAG" \
+            "dist/ZBK-Server-Setup-$VERSION.exe" \
+            "dist/ZBK-Server-$VERSION-portable.exe" \
+            dist/SHA256SUMS.txt \
+            --title "ZBK Server $RELEASE_TAG" \
+            --generate-notes \
+            --verify-tag

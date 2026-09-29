@@ -1,0 +1,54 @@
+{
+  "name": "zbk-server",
+  "version": "1.0.0",
+  "description": "Desktop app that runs a Minecraft server for a Zombies Build Kit world",
+  "private": true,
+  "license": "SEE LICENSE IN LICENSES/LICENSE.md",
+  "author": "MiniStew",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test \"test/*.test.js\"",
+    "build": "electron-builder --win nsis portable",
+    "check:package": "node tools/check_package.js"
+  },
+  "build": {
+    "appId": "com.ministew.zbkserver",
+    "productName": "ZBK Server",
+    "icon": "assets/icon.png",
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "extraFiles": [
+      {
+        "from": "LICENSES",
+        "to": "LICENSES"
+      }
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "portable": {
+      "artifactName": "ZBK-Server-${version}-portable.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "ZBK Server",
+      "artifactName": "ZBK-Server-Setup-${version}.${ext}"
+    }
+  },
+  "devDependencies": {
+    "electron": "^44.5.0",
+    "electron-builder": "^26.15.3"
+  }
+}
